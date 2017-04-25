@@ -11,7 +11,7 @@ static char ca_docstring[] =
 
 static PyObject *chi2_ca(PyObject *self, PyObject *args)
 {
-    double n=0;
+    int n;
     char *s;
     if (!PyArg_ParseTuple(args, "s", &s)) return NULL;
 
@@ -74,8 +74,8 @@ static PyObject *chi2_chi2(PyObject *self, PyObject *args)
 }
 
 static PyMethodDef module_methods[] = {
+    {"ca", chi2_ca, METH_VARARGS, ca_docstring},
     {"chi2", chi2_chi2, METH_VARARGS, chi2_docstring},
-    //{"ca", chi2_ca, METH_VARARGS, ca_docstring},
     {NULL, NULL, 0, NULL}
 };
 
@@ -83,7 +83,7 @@ PyMODINIT_FUNC init_chi2(void)
 {
     PyObject *m = Py_InitModule3("_chi2", module_methods, module_docstring);
     if (m == NULL)
-        return NULL;
+        return;
 
     /* Load `numpy` functionality. */
     import_array();
