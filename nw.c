@@ -9,7 +9,6 @@
 #define MATCH_VALUE 0
 
 #define MAX2(x,y) ((x) >= (y) ? (x) : (y))
-#define MIN2(x,y) ((x) <= (y) ? (x) : (y))
 #define MAX3(x,y,z) ((x) >= (y) && (x) >= (z) ? (x) : MAX2(y,z))
 
 void print_matrix(int **x, int r, int c) {
@@ -204,6 +203,7 @@ double nw(char *s1, char *s2, int match_score, int mismatch_score, int gap_score
     // make up the aligned strings and print them, separately
     if (print_alignments) {
         aligned_strings(o, s1, s2, a1, a2);
+        printf("match=%i, mm=%i ins=%i del=%i l1+del=%i l2+ins=%i wrong=%i\n", n_matches, n_mismatches, n_insertions, n_deletions, l1 + n_deletions, l2 + n_insertions, l1 + n_insertions);
         printf("%s\n", a1);
         printf("%s\n", a2);
     }
@@ -213,8 +213,6 @@ double nw(char *s1, char *s2, int match_score, int mismatch_score, int gap_score
 
     for (i = 0; i < l1; i++)
         free(o[i]);
-
-    printf("match=%i, mm=%i ins=%i del=%i l1+del=%i l2+ins=%i wrong=%i\n", n_matches, n_mismatches, n_insertions, n_deletions, l1 + n_deletions, l2 + n_insertions, l1 + n_insertions);
 
     return ((double) n_mismatches + (double) n_insertions + (double) n_deletions) / ((double) l1 + (double) n_deletions);
 }
