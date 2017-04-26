@@ -24,7 +24,83 @@ void print_matrix(int **x, int r, int c) {
     }
 }
 
-int nw(char *s1, char *s2, int match_score, int mismatch_score, int gap_score) {
+void string_reverse(char *s) {
+    int length = strlen(s);
+    int c, i, j;
+
+    for (i = 0, j = length - 1; i < j; i++, j--) {
+        c = s[i];
+        s[i] = s[j];
+        s[j] = c;
+    }
+}
+
+void aligned_strings(int **outcomes, char *s1, char *s2, char *alignment1, char *alignment2) {
+    const int l1 = strlen(s1);
+    const int l2 = strlen(s2);
+    int i;
+    int j;
+    int c;
+    int idx1;
+    int idx2;
+
+    memset(alignment1, '\0', l1 + l2 + 1);
+    memset(alignment2, '\0', l1 + l2 + 1);
+
+    i = l1;
+    j = l2;
+    idx1 = 0;
+    idx2 = 0;
+
+    while (i > 0 && j > 0) {
+        switch(outcomes[i - 1][j - 1]) {
+            case MATCH_VALUE :
+                alignment1[idx1] = s1[i - 1];
+                alignment2[idx2] = s2[j - 1];
+                i -= 1;
+                j -= 1;
+                break;
+            case DELETE_VALUE :
+                alignment1[idx1] = s1[i - 1];
+                alignment2[idx2] = '-';
+                i -= 1;
+                break;
+            case INSERT_VALUE :
+                alignment1[idx1] = '-';
+                alignment2[idx2] = s2[j - 1];
+                j -= 1;
+                break;
+            default :
+                printf("Bad max value\n");
+                exit(EXIT_FAILURE);
+        }
+
+        idx1 += 1;
+        idx2 += 1;
+    }
+
+    while (i > 0) {
+        alignment1[idx1] = s1[i - 1];
+        alignment2[idx2] = '-';
+        idx1 += 1;
+        idx2 += 1;
+        i -= 1;
+    }
+
+    while(j > 0) {
+        alignment1[idx1] = '-';
+        alignment2[idx2] = s2[j - 1];
+        idx1 += 1;
+        idx2 += 1;
+        j -= 1;
+    }
+
+    // reverse the strings
+    string_reverse(alignment1);
+    string_reverse(alignment2);
+}
+
+int nw(char *s1, char *s2, int match_score, int mismatch_score, int gap_score, int print_alignments) {
     int l1 = strlen(s1);
     int l2 = strlen(s2);
     int i;
@@ -37,8 +113,6 @@ int nw(char *s1, char *s2, int match_score, int mismatch_score, int gap_score) {
 
     char a1[l1 + l2 + 1];
     char a2[l2 + l2 + 1];
-    int idx1;
-    int idx2;
 
     int *score[l1 + 1];
     int *o[l1];
@@ -93,65 +167,39 @@ int nw(char *s1, char *s2, int match_score, int mismatch_score, int gap_score) {
         }
     }
 
-    memset(a1, '\0', l1 + l2 + 1);
-    memset(a2, '\0', l1 + l2 + 1);
-
     i = l1;
     j = l2;
     nmm = 0;
-    idx1 = 0;
-    idx2 = 0;
 
     while (i > 0 && j > 0) {
         switch(o[i - 1][j - 1]) {
             case MATCH_VALUE :
-                a1[idx1] = s1[i - 1];
-                a2[idx2] = s2[j - 1];
                 i -= 1;
                 j -= 1;
-
-                if (s1[i] != s2[j]) {
+                if (s1[i] != s2[j])
                     nmm += 1;
-                }
                 break;
             case DELETE_VALUE :
-                a1[idx1] = s1[i - 1];
-                a2[idx2] = '-';
                 i -= 1;
                 nmm += 1;
                 break;
             case INSERT_VALUE :
-                a1[idx1] = '-';
-                a2[idx2] = s2[j - 1];
                 j -= 1;
                 nmm += 1;
                 break;
             default :
-                printf("o at i=%i j=%i is bad=%i\n", i, j, (o[i - 1][j - 1]));
                 printf("Bad max value\n");
                 exit(EXIT_FAILURE);
         }
-
-        idx1 += 1;
-        idx2 += 1;
     }
 
-    while (i > 0) {
-        a1[idx1] = s1[i - 1];
-        a2[idx2] = '-';
-        idx1 += 1;
-        idx2 += 1;
-        i -= 1;
-        nmm += 1;
-    }
+    nmm += i + j;
 
-    while(j > 0) {
-        a1[idx1] = '-';
-        a2[idx2] = s2[j - 1];
-        idx1 += 1;
-        idx2 += 1;
-        j -= 1;
-        nmm += 1;
+    // make up the aligned strings and print them, separately
+    if (print_alignments) {
+        aligned_strings(o, s1, s2, a1, a2);
+        printf("%s\n", a1);
+        printf("%s\n", a2);
     }
 
     for (i = 0; i <= l1; i++)
@@ -160,8 +208,6 @@ int nw(char *s1, char *s2, int match_score, int mismatch_score, int gap_score) {
     for (i = 0; i < l1; i++)
         free(o[i]);
 
-    printf("%s\n", a1);
-    printf("%s\n", a2);
     return nmm;
 }
 
@@ -171,6 +217,6 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    printf("%i\n", nw(argv[1], argv[2], 1, -1, -1));
+    printf("%i\n", nw(argv[1], argv[2], 1, -1, -1, 0));
     exit(EXIT_SUCCESS);
 }
