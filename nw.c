@@ -152,12 +152,12 @@ double nw(char *s1, char *s2, int match_score, int mismatch_score, int gap_score
             best = MAX3(match, delete, insert);
             score[i][j] = best;
 
-            if (best == match) {
-                o[i - 1][j - 1] = MATCH_VALUE;
-            } else if (best == delete) {
+            if (best == delete) {
                 o[i - 1][j - 1] = DELETE_VALUE;
             } else if (best == insert) {
                 o[i - 1][j - 1] = INSERT_VALUE;
+            } else if (best == match) {
+                o[i - 1][j - 1] = MATCH_VALUE;
             } else {
                 printf("max %i not one of match=%i del=%i ins=%i\n", best, match, delete, insert);
                 printf("Bad max value\n");
@@ -225,6 +225,6 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    printf("%f\n", nw(argv[1], argv[2], 1, -1, -1, 1));
+    printf("%f\n", nw(argv[1], argv[2], 1, -2, -2, 1));
     exit(EXIT_SUCCESS);
 }

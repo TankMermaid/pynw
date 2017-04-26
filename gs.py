@@ -29,8 +29,8 @@ if __name__ == '__main__':
     p.add_argument('seq1')
     p.add_argument('seq2')
     p.add_argument('--match', default=1)
-    p.add_argument('--mismatch', default=-1)
-    p.add_argument('--gap', default=-1)
+    p.add_argument('--mismatch', default=-2)
+    p.add_argument('--gap', default=-2)
     p.add_argument('--gapopen', default=0)
     args = p.parse_args()
 
@@ -40,7 +40,7 @@ if __name__ == '__main__':
         args.seq1, args.seq2], stdout=subprocess.PIPE)
 
     a1, a2 = res.stdout.decode().split('\n')[0:2]
-    print(a1)
-    print(a2)
+    #print(a1)
+    #print(a2)
     print(hamming(a1, a2))
-    print(counts(a1, a2))
+    #print(counts(a1, a2))

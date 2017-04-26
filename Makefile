@@ -3,6 +3,9 @@
 build:
 	python setup.py build_ext --inplace
 
+build3:
+	python3 setup.py build_ext --inplace
+
 test:
 	python test.py
 
