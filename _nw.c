@@ -10,14 +10,14 @@ static char nw_docstring[] =
 static PyObject *nw_nw(PyObject *self, PyObject *args) {
     char *s1, *s2;
     int match_score, mismatch_score, gap_score;
-    int n_mismatches;
+    double score;
     int print_alignments = 0;
     if (!PyArg_ParseTuple(args, "ssiii", &s1, &s2, &match_score, &mismatch_score, &gap_score))
         return NULL;
 
-    n_mismatches = nw(s1, s2, match_score, mismatch_score, gap_score, print_alignments);
+    score = nw(s1, s2, match_score, mismatch_score, gap_score, print_alignments);
 
-    PyObject *ret = Py_BuildValue("i", n_mismatches);
+    PyObject *ret = Py_BuildValue("d", score);
     return ret;
 }
 

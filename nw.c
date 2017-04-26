@@ -99,7 +99,7 @@ void aligned_strings(int **outcomes, char *s1, char *s2, char *alignment1, char 
     string_reverse(alignment2);
 }
 
-int nw(char *s1, char *s2, int match_score, int mismatch_score, int gap_score, int print_alignments) {
+double nw(char *s1, char *s2, int match_score, int mismatch_score, int gap_score, int print_alignments) {
     int l1 = strlen(s1);
     int l2 = strlen(s2);
     int i;
@@ -108,7 +108,7 @@ int nw(char *s1, char *s2, int match_score, int mismatch_score, int gap_score, i
     int delete;
     int insert;
     int best;
-    int nmm;
+    int n_matches, n_mismatches, n_deletions, n_insertions;
 
     char a1[l1 + l2 + 1];
     char a2[l2 + l2 + 1];
@@ -168,23 +168,29 @@ int nw(char *s1, char *s2, int match_score, int mismatch_score, int gap_score, i
 
     i = l1;
     j = l2;
-    nmm = 0;
+    n_matches = 0;
+    n_mismatches = 0;
+    n_deletions = 0;
+    n_insertions = 0;
 
     while (i > 0 && j > 0) {
         switch(o[i - 1][j - 1]) {
             case MATCH_VALUE :
                 i -= 1;
                 j -= 1;
-                if (s1[i] != s2[j])
-                    nmm += 1;
+                if (s1[i] == s2[j]) {
+                    n_matches += 1;
+                } else {
+                    n_mismatches += 1;
+                }
                 break;
             case DELETE_VALUE :
                 i -= 1;
-                nmm += 1;
+                n_deletions += 1;
                 break;
             case INSERT_VALUE :
                 j -= 1;
-                nmm += 1;
+                n_insertions += 1;
                 break;
             default :
                 printf("Bad max value\n");
@@ -192,7 +198,8 @@ int nw(char *s1, char *s2, int match_score, int mismatch_score, int gap_score, i
         }
     }
 
-    nmm += i + j;
+    n_insertions += i;
+    n_deletions += j;
 
     // make up the aligned strings and print them, separately
     if (print_alignments) {
@@ -207,7 +214,9 @@ int nw(char *s1, char *s2, int match_score, int mismatch_score, int gap_score, i
     for (i = 0; i < l1; i++)
         free(o[i]);
 
-    return nmm;
+    printf("match=%i, mm=%i ins=%i del=%i l1+del=%i l2+ins=%i wrong=%i\n", n_matches, n_mismatches, n_insertions, n_deletions, l1 + n_deletions, l2 + n_insertions, l1 + n_insertions);
+
+    return ((double) n_mismatches + (double) n_insertions + (double) n_deletions) / ((double) l1 + (double) n_deletions);
 }
 
 int main(int argc, char *argv[]) {
@@ -216,6 +225,6 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    printf("%i\n", nw(argv[1], argv[2], 1, -1, -1, 0));
+    printf("%f\n", nw(argv[1], argv[2], 1, -1, -1, 1));
     exit(EXIT_SUCCESS);
 }
