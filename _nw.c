@@ -26,8 +26,32 @@ static PyMethodDef module_methods[] = {
     {NULL, NULL, 0, NULL}
 };
 
-PyMODINIT_FUNC init_nw(void) {
-    PyObject *m = Py_InitModule3("_nw", module_methods, module_docstring);
-    if (m == NULL)
+
+#if PY_MAJOR_VERSION >= 3
+
+static struct PyModuleDef module_def = {
+    PyModuleDef_HEAD_INIT,
+    "nw",
+    module_docstring,
+    -1,
+    module_methods
+};
+
+PyMODINIT_FUNC PyInit__nw(void) {
+    PyObject *module;
+    module = PyModule_Create(&module_def);
+    if (module == NULL)
+        return NULL;
+
+    return module;
+}
+
+#else // Python 2
+
+void init_nw(void) {
+    PyObject *module = Py_InitModule3("_nw", module_methods, module_docstring);
+    if (module == NULL)
         return;
 }
+
+#endif // Python version

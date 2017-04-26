@@ -1,10 +1,12 @@
 .PHONY: build test c
 
 build:
-	python setup.py build_ext --inplace
+	python2 setup.py build_ext --inplace
+	python2 -c "import _nw"
 
 build3:
 	python3 setup.py build_ext --inplace
+	python3 -c "import _nw"
 
 test:
 	python test.py
