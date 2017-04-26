@@ -40,7 +40,6 @@ void aligned_strings(int **outcomes, char *s1, char *s2, char *alignment1, char 
     const int l2 = strlen(s2);
     int i;
     int j;
-    int c;
     int idx1;
     int idx2;
 

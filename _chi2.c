@@ -16,7 +16,6 @@ static PyObject *chi2_ca(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "s", &s)) return NULL;
 
     n = ca(s);
-    Py_DECREF(s);
 
     PyObject *ret = Py_BuildValue("i", n);
     return ret;
