@@ -24,7 +24,7 @@ void print_matrix(int **x, int r, int c) {
     }
 }
 
-int nw(char *s1, char *s2) {
+int nw(char *s1, char *s2, int match_score, int mismatch_score, int gap_score) {
     int l1 = strlen(s1);
     int l2 = strlen(s2);
     int i;
@@ -33,16 +33,17 @@ int nw(char *s1, char *s2) {
     int delete;
     int insert;
     int best;
+    int nmm;
 
-    const int match_score = 1;
-    const int mismatch_score = -1;
-    const int gap_score = -1;
-
-    int nmm = 0;
+    char a1[l1 + l2 + 1];
+    char a2[l2 + l2 + 1];
+    int idx1;
+    int idx2;
 
     int *score[l1 + 1];
+    int *o[l1];
+
     for (i = 0; i <= l1; i++) {
-        //swo > check that malloc actually allocates
         score[i] = (int *)malloc((l2 + 1) * sizeof(int));
         if (score[i] == NULL) {
             printf("Memory allocation failed\n");
@@ -50,7 +51,6 @@ int nw(char *s1, char *s2) {
         }
     }
 
-    int *o[l1];
     for (i = 0; i < l1; i++) {
         o[i] = (int *)malloc(l2 * sizeof(int));
         if (o[i] == NULL) {
@@ -93,16 +93,14 @@ int nw(char *s1, char *s2) {
         }
     }
 
-    char a1[l1 + l2 + 1];
-    char a2[l2 + l2 + 1];
     memset(a1, '\0', l1 + l2 + 1);
     memset(a2, '\0', l1 + l2 + 1);
-    int idx1 = 0;
-    int idx2 = 0;
 
     i = l1;
     j = l2;
     nmm = 0;
+    idx1 = 0;
+    idx2 = 0;
 
     while (i > 0 && j > 0) {
         switch(o[i - 1][j - 1]) {
@@ -113,23 +111,18 @@ int nw(char *s1, char *s2) {
                 j -= 1;
 
                 if (s1[i] != s2[j]) {
-                    /* printf("mismatch %c %c\n", s1[i], s2[j]); */
                     nmm += 1;
-                } else {
-                    /* printf("match %c %c\n", s1[i], s2[j]); */
                 }
                 break;
             case DELETE_VALUE :
                 a1[idx1] = s1[i - 1];
                 a2[idx2] = '-';
-                /* printf("delete %i\n", i); */
                 i -= 1;
                 nmm += 1;
                 break;
             case INSERT_VALUE :
                 a1[idx1] = '-';
                 a2[idx2] = s2[j - 1];
-                /* printf("insert %i\n", j); */
                 j -= 1;
                 nmm += 1;
                 break;
@@ -178,6 +171,6 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    printf("%i\n", nw(argv[1], argv[2]));
+    printf("%i\n", nw(argv[1], argv[2], 1, -1, -1));
     exit(EXIT_SUCCESS);
 }
